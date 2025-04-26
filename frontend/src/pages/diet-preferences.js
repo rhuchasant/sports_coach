@@ -2,67 +2,31 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { motion } from 'framer-motion';
 
 export default function DietPreferences() {
   const router = useRouter();
-  const [dietTypes, setDietTypes] = useState([]);
   const [dietType, setDietType] = useState('');
   const [restrictions, setRestrictions] = useState([]);
-  const [newRestriction, setNewRestriction] = useState('');
+  const [availableDietTypes, setAvailableDietTypes] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Check if user ID exists
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      router.push('/register');
-      return;
-    }
-
-    // Fetch diet types from API
-    const fetchDietTypes = async () => {
-      try {
-        const response = await fetch('http://localhost:5000/api/diet_types');
-        const data = await response.json();
-        setDietTypes(data.dietTypes);
-      } catch (err) {
-        console.error('Error fetching diet types:', err);
-        // Fallback values
-        setDietTypes(['vegetarian', 'vegan', 'keto', 'paleo', 'balanced', 'high_protein', 'no_restrictions']);
-      }
-    };
-
-    fetchDietTypes();
+    // Fetch available diet types from backend
+    fetch('http://localhost:5000/api/diet_types')
+      .then(response => response.json())
+      .then(data => setAvailableDietTypes(data.dietTypes))
+      .catch(err => console.error('Error fetching diet types:', err));
   }, []);
-
-  const addRestriction = (e) => {
-    e.preventDefault();
-    if (!newRestriction.trim()) return;
-    
-    setRestrictions([...restrictions, newRestriction.trim()]);
-    setNewRestriction('');
-  };
-
-  const removeRestriction = (index) => {
-    const newRestrictions = [...restrictions];
-    newRestrictions.splice(index, 1);
-    setRestrictions(newRestrictions);
-  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
     setError('');
 
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      setError('User session not found. Please register again.');
-      setLoading(false);
-      return;
-    }
-
     try {
+      const userId = localStorage.getItem('userId');
       const response = await fetch('http://localhost:5000/api/diet', {
         method: 'POST',
         headers: {
@@ -71,123 +35,139 @@ export default function DietPreferences() {
         body: JSON.stringify({
           userId,
           dietType,
-          restrictions
+          restrictions,
         }),
       });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Navigate to the final plan page
-        router.push('/fitness-plan');
-      } else {
-        setError(data.message || 'Failed to set diet preferences');
+      if (!response.ok) {
+        throw new Error('Failed to save diet preferences');
       }
+
+      router.push('/past-history');
     } catch (err) {
-      console.error('Error setting diet preferences:', err);
-      setError('Network error. Please try again later.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <Head>
-        <title>Diet Preferences - Sports Fitness Coach AI</title>
+        <title>Diet Preferences - Sports Fitness Coach</title>
       </Head>
-      
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-blue-600 px-6 py-4">
-          <h2 className="text-2xl font-bold text-white">Diet Preferences</h2>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-3xl mx-auto"
+      >
+        <div className="text-center mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-4xl font-bold text-white mb-4"
+          >
+            Diet Preferences
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-gray-300 text-lg"
+          >
+            Let us know about your dietary preferences to create a personalized nutrition plan
+          </motion.p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
-          {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
-              {error}
-            </div>
-          )}
-          
-          <div>
-            <label htmlFor="dietType" className="block text-sm font-medium text-gray-700">Diet Type</label>
+
+        <motion.form
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          onSubmit={handleSubmit}
+          className="space-y-8"
+        >
+          {/* Diet Type Selection */}
+          <div className="space-y-4">
+            <label className="block text-gray-300 text-lg font-medium">
+              Preferred Diet Type
+            </label>
             <select
-              id="dietType"
               value={dietType}
               onChange={(e) => setDietType(e.target.value)}
+              className="w-full px-4 py-3 bg-gray-800 border border-gray-700 rounded-lg text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
             >
-              <option value="">Select diet type</option>
-              {dietTypes.map((type) => (
+              <option value="">Select a diet type</option>
+              {availableDietTypes.map((type) => (
                 <option key={type} value={type}>
-                  {type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  {type}
                 </option>
               ))}
             </select>
           </div>
-          
-          <div>
-            <label className="block text-sm font-medium text-gray-700 mb-2">Dietary Restrictions</label>
-            
-            <div className="flex">
-              <input
-                 type="text"
-                 value={newRestriction}
-                 onChange={(e) => setNewRestriction(e.target.value)}
-                 placeholder="e.g., gluten-free, dairy-free"
-                 className="flex-grow border border-gray-300 rounded-l-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-               />
-               <button
-                 type="button"
-                 onClick={addRestriction}
-                 className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-r-md focus:outline-none focus:shadow-outline"
-               >
-                 Add
-               </button>
-             </div>
-             
-             {restrictions.length > 0 && (
-               <div className="mt-2">
-                 <ul className="bg-gray-50 rounded-md p-2">
-                   {restrictions.map((restriction, index) => (
-                     <li key={index} className="flex justify-between items-center py-1">
-                       <span>{restriction}</span>
-                       <button
-                         type="button"
-                         onClick={() => removeRestriction(index)}
-                         className="text-red-600 hover:text-red-800"
-                       >
-                         <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
-                           <path fillRule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clipRule="evenodd" />
-                         </svg>
-                       </button>
-                     </li>
-                   ))}
-                 </ul>
-               </div>
-             )}
-           </div>
-           
-           <div className="pt-2 flex justify-between">
-             <button
-               type="button"
-               onClick={() => router.back()}
-               className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-             >
-               Back
-             </button>
-             
-             <button
-               type="submit"
-               disabled={loading}
-               className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-             >
-               {loading ? 'Processing...' : 'Generate Plan'}
-             </button>
-           </div>
-         </form>
-       </div>
-     </div>
-   );
- }
+
+          {/* Dietary Restrictions */}
+          <div className="space-y-4">
+            <label className="block text-gray-300 text-lg font-medium">
+              Dietary Restrictions (Optional)
+            </label>
+            <div className="space-y-2">
+              {['Vegetarian', 'Vegan', 'Gluten-Free', 'Dairy-Free', 'Nut-Free'].map((restriction) => (
+                <label key={restriction} className="flex items-center space-x-3">
+                  <input
+                    type="checkbox"
+                    checked={restrictions.includes(restriction)}
+                    onChange={(e) => {
+                      if (e.target.checked) {
+                        setRestrictions([...restrictions, restriction]);
+                      } else {
+                        setRestrictions(restrictions.filter(r => r !== restriction));
+                      }
+                    }}
+                    className="h-5 w-5 text-blue-500 rounded border-gray-700 focus:ring-blue-500"
+                  />
+                  <span className="text-gray-300">{restriction}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          {error && (
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              className="text-red-500 text-center"
+            >
+              {error}
+            </motion.div>
+          )}
+
+          {/* Navigation Buttons */}
+          <div className="flex justify-between pt-8">
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(59, 130, 246, 0.5)" }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => router.back()}
+              className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-300"
+            >
+              Back
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02, boxShadow: "0 0 20px rgba(59, 130, 246, 0.5)" }}
+              whileTap={{ scale: 0.98 }}
+              type="submit"
+              disabled={loading}
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
+            >
+              {loading ? 'Saving...' : 'Continue to Past History'}
+            </motion.button>
+          </div>
+        </motion.form>
+      </motion.div>
+    </div>
+  );
+}

@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
+import { motion } from 'framer-motion';
 
 export default function CompetitionDetails() {
   const router = useRouter();
@@ -68,14 +69,8 @@ export default function CompetitionDetails() {
     setLoading(true);
     setError('');
 
-    const userId = localStorage.getItem('userId');
-    if (!userId) {
-      setError('User session not found. Please register again.');
-      setLoading(false);
-      return;
-    }
-
     try {
+      const userId = localStorage.getItem('userId');
       const response = await fetch('http://localhost:5000/api/competition', {
         method: 'POST',
         headers: {
@@ -89,116 +84,153 @@ export default function CompetitionDetails() {
         }),
       });
 
-      const data = await response.json();
-      
-      if (response.ok) {
-        // Navigate to the past history page
-        router.push('/past-history');
-      } else {
-        setError(data.message || 'Failed to set competition details');
+      if (!response.ok) {
+        throw new Error('Failed to save competition details');
       }
+
+      router.push('/diet-preferences');
     } catch (err) {
-      console.error('Error setting competition details:', err);
-      setError('Network error. Please try again later.');
+      setError(err.message);
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-b from-gray-900 to-gray-800 py-12 px-4 sm:px-6 lg:px-8">
       <Head>
-        <title>Competition Details - Sports Fitness Coach AI</title>
+        <title>Competition Details - Sports Fitness Coach</title>
       </Head>
-      
-      <div className="max-w-md mx-auto bg-white rounded-lg shadow-md overflow-hidden">
-        <div className="bg-blue-600 px-6 py-4">
-          <h2 className="text-2xl font-bold text-white">Competition Details</h2>
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="max-w-3xl mx-auto"
+      >
+        <div className="text-center mb-12">
+          <motion.h1
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.2 }}
+            className="text-4xl font-bold text-white mb-4"
+          >
+            Competition Details
+          </motion.h1>
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.5, delay: 0.4 }}
+            className="text-gray-300 text-lg"
+          >
+            Tell us about your competition goals and experience
+          </motion.p>
         </div>
-        
-        <form onSubmit={handleSubmit} className="px-6 py-4 space-y-4">
+
+        <motion.form
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.6 }}
+          onSubmit={handleSubmit}
+          className="bg-gray-800 rounded-xl p-8 shadow-lg border border-gray-700"
+        >
           {error && (
-            <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded">
+            <motion.div
+              initial={{ opacity: 0, y: -10 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="bg-red-900/50 border border-red-700 text-red-200 px-4 py-3 rounded-lg mb-6"
+            >
               {error}
-            </div>
+            </motion.div>
           )}
-          
-          <div>
-            <label htmlFor="competitionType" className="block text-sm font-medium text-gray-700">Competition Type</label>
-            <select
-              id="competitionType"
-              name="competitionType"
-              value={formData.competitionType}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select competition type</option>
-              {competitionTypes.map((type) => (
-                <option key={type} value={type}>
-                  {type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                </option>
-              ))}
-            </select>
+
+          <div className="space-y-6">
+            <div>
+              <label htmlFor="competitionType" className="block text-sm font-medium text-gray-300 mb-2">
+                Competition Type
+              </label>
+              <select
+                id="competitionType"
+                name="competitionType"
+                value={formData.competitionType}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="" className="text-gray-400">Select competition type</option>
+                {competitionTypes.map((type) => (
+                  <option key={type} value={type} className="text-gray-200">
+                    {type.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="format" className="block text-sm font-medium text-gray-300 mb-2">
+                Format
+              </label>
+              <select
+                id="format"
+                name="format"
+                value={formData.format}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="" className="text-gray-400">Select format</option>
+                {formats.map((format) => (
+                  <option key={format} value={format} className="text-gray-200">
+                    {format.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            <div>
+              <label htmlFor="level" className="block text-sm font-medium text-gray-300 mb-2">
+                Level
+              </label>
+              <select
+                id="level"
+                name="level"
+                value={formData.level}
+                onChange={handleChange}
+                required
+                className="w-full px-4 py-3 bg-gray-700 border border-gray-600 rounded-lg text-gray-200 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              >
+                <option value="" className="text-gray-400">Select level</option>
+                {levels.map((level) => (
+                  <option key={level} value={level} className="text-gray-200">
+                    {level.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
-          
-          <div>
-            <label htmlFor="format" className="block text-sm font-medium text-gray-700">Format</label>
-            <select
-              id="format"
-              name="format"
-              value={formData.format}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select format</option>
-              {formats.map((format) => (
-                <option key={format} value={format}>
-                  {format.split('_').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div>
-            <label htmlFor="level" className="block text-sm font-medium text-gray-700">Competition Level</label>
-            <select
-              id="level"
-              name="level"
-              value={formData.level}
-              onChange={handleChange}
-              required
-              className="mt-1 block w-full border border-gray-300 rounded-md shadow-sm py-2 px-3 focus:outline-none focus:ring-blue-500 focus:border-blue-500"
-            >
-              <option value="">Select level</option>
-              {levels.map((level) => (
-                <option key={level} value={level}>
-                  {level.charAt(0).toUpperCase() + level.slice(1)}
-                </option>
-              ))}
-            </select>
-          </div>
-          
-          <div className="pt-2 flex justify-between">
-            <button
-              type="button"
+
+          <div className="flex justify-between pt-8">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               onClick={() => router.back()}
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-gray-700 hover:bg-gray-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg transition-all duration-300"
             >
               Back
-            </button>
-            
-            <button
+            </motion.button>
+
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
               type="submit"
               disabled={loading}
-              className="bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white font-semibold py-3 px-6 rounded-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50"
             >
-              {loading ? 'Processing...' : 'Continue'}
-            </button>
+              {loading ? 'Saving...' : 'Continue to Diet Preferences'}
+            </motion.button>
           </div>
-        </form>
-      </div>
+        </motion.form>
+      </motion.div>
     </div>
   );
 }
