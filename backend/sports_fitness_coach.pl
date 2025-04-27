@@ -777,51 +777,54 @@ severity_recommendation('severe', [
     'Consult with a medical professional before starting'
 ]).
 
-% Injury-specific recommendations
-injury_recommendation(sprained_ankle, [
-    "Focus on ankle strengthening exercises like calf raises and resistance band exercises",
-    "Use proper ankle support during training and consider taping for high-impact activities"
+% Specific named injury recommendations
+specific_injury_recommendation('sprained_ankle', [
+    'Focus on ankle strengthening exercises like calf raises and resistance band exercises',
+    'Use proper ankle support during training and consider taping for high-impact activities'
 ]).
 
-injury_recommendation(shoulder_impingement, [
-    "Incorporate rotator cuff strengthening exercises with light resistance",
-    "Avoid overhead movements until pain subsides and focus on proper shoulder mechanics"
+specific_injury_recommendation('shoulder_impingement', [
+    'Incorporate rotator cuff strengthening exercises with light resistance',
+    'Avoid overhead movements until pain subsides and focus on proper shoulder mechanics'
 ]).
 
-injury_recommendation(hamstring_strain, [
-    "Gradually increase hamstring flexibility through controlled stretching",
-    "Strengthen hamstrings with eccentric exercises like Nordic curls"
+specific_injury_recommendation('hamstring_strain', [
+    'Gradually increase hamstring flexibility through controlled stretching',
+    'Strengthen hamstrings with eccentric exercises like Nordic curls'
 ]).
 
-injury_recommendation(knee_tendonitis, [
-    "Reduce high-impact activities and focus on quadriceps strengthening",
-    "Use proper warm-up and cool-down routines, including foam rolling"
+specific_injury_recommendation('knee_tendonitis', [
+    'Reduce high-impact activities and focus on quadriceps strengthening',
+    'Use proper warm-up and cool-down routines, including foam rolling'
 ]).
 
-injury_recommendation(back_strain, [
-    "Focus on core strengthening exercises to support the lower back",
-    "Maintain proper posture during exercises and daily activities"
+specific_injury_recommendation('back_strain', [
+    'Focus on core strengthening exercises to support the lower back',
+    'Maintain proper posture during exercises and daily activities'
 ]).
 
-% Get specific injury recommendations
+% Get combined injury recommendations
 get_injury_recommendations(UserId, Recommendations) :-
     findall(
         Recs,
-        (user_injury(UserId, Type, _, _, _, _),
-         injury_recommendation(Type, Recs)),
+        ( user_injury(UserId, Type, Severity, _, _, _),
+          injury_recommendation(Type, Severity, TypeSeverityRecs),
+          ( specific_injury_recommendation(Type, SpecificRecs) -> true ; SpecificRecs = [] ),
+          append(TypeSeverityRecs, SpecificRecs, Recs)
+        ),
         InjuryRecs
     ),
-    (InjuryRecs = [] ->
+    ( InjuryRecs = [] ->
         Recommendations = ["No current injuries. Continue with regular training and recovery protocols."]
     ;
         flatten(InjuryRecs, AllRecs),
-        % Take only the first 2-3 recommendations
-        (length(AllRecs, L), L > 3 ->
+        ( length(AllRecs, L), L > 3 ->
             take(3, AllRecs, Recommendations)
         ;
             Recommendations = AllRecs
         )
     ).
+
 
 % Helper predicate to take N elements from a list
 take(0, _, []).
