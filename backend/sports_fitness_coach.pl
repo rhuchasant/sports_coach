@@ -128,6 +128,11 @@ diet_restriction(soy_free).
 diet_restriction(egg_free).
 
 % Injury types
+injury_type(shoulder).
+injury_type(knee).
+injury_type(back).
+injury_type(ankle).
+injury_type(elbow).
 injury_type(muscle_strain).
 injury_type(sprain).
 injury_type(fracture).
@@ -172,6 +177,17 @@ sport_specific_training(running, [
     'Recovery Runs (2-3x/week): Easy pace focusing on form'
 ]).
 
+% Add yoga-specific training plan
+sport_specific_training(yoga, [
+    'Asana Practice (4-5x/week): Focus on proper alignment and breathing',
+    'Meditation and Pranayama (daily): Breath control and mindfulness exercises',
+    'Flow Sequences (2-3x/week): Dynamic movement patterns linking poses',
+    'Flexibility Training (3x/week): Deep stretching and mobility work',
+    'Core Strengthening (2x/week): Stability and balance exercises',
+    'Balance Work (2x/week): Standing poses and equilibrium exercises',
+    'Restorative Practice (1x/week): Gentle poses and deep relaxation'
+]).
+
 % Default for other sports
 sport_specific_training(_, [
     'Skill Development (3x/week): Sport-specific technique and movement patterns',
@@ -179,6 +195,16 @@ sport_specific_training(_, [
     'Cardio Conditioning (2x/week): Sport-specific endurance training',
     'Flexibility Work (2x/week): Dynamic and static stretching',
     'Recovery Sessions (1x/week): Light activity and mobility work'
+]).
+
+sport_specific_training(cycling, [
+    'Endurance Rides (2-3x/week): Long-distance rides at steady pace',
+    'Interval Training (2x/week): High-intensity efforts with recovery periods',
+    'Hill Training (1x/week): Climbing and descending technique',
+    'Technique Work (2x/week): Focus on pedaling efficiency and bike handling',
+    'Recovery Rides (1x/week): Light spinning to maintain active recovery',
+    'Strength Training (2x/week): Core and leg-specific exercises',
+    'Flexibility Work (2x/week): Focus on hip, back, and leg mobility'
 ]).
 
 % Fitness level training
@@ -283,6 +309,25 @@ sport_specific_diet(running, [
     'Post-Run Recovery: 4:1 carb to protein ratio within 30 minutes (smoothie with plant milk, banana, and protein powder)',
     'Training Days: Higher carb intake, focus on whole grains (quinoa, brown rice, whole wheat pasta)',
     'Rest Days: Balanced meals with emphasis on recovery foods (nuts, seeds, leafy greens)'
+]).
+
+% Add yoga-specific diet plan
+sport_specific_diet(yoga, [
+    'Pre-Practice: Light, easily digestible meals 2-3 hours before (fruits, smoothies, light grains)',
+    'Post-Practice: Plant-based proteins and anti-inflammatory foods within 1 hour',
+    'Daily Focus: Whole, unprocessed foods with emphasis on fresh vegetables and fruits',
+    'Hydration: Maintain steady water intake throughout the day, herbal teas for recovery',
+    'Mindful Eating: Small, frequent meals focusing on sattvic foods (pure, light, and energy-giving)'
+]).
+
+% Add cycling-specific diet recommendations
+sport_specific_diet(cycling, [
+    'Pre-ride nutrition: Complex carbohydrates 2-3 hours before riding',
+    'During ride: Energy gels or sports drinks for rides over 90 minutes',
+    'Post-ride recovery: 4:1 carb to protein ratio within 30 minutes',
+    'Hydration: 500-750ml fluid per hour of riding',
+    'Electrolyte replacement for longer rides',
+    'Energy-dense snacks for long rides: bananas, energy bars, dried fruits'
 ]).
 
 % Diet type recommendations with specific food items
@@ -712,15 +757,13 @@ injury_recommendation(Type, Severity, Recommendations) :-
     append(TypeRecs, SeverityRecs, Recommendations).
 
 % Injury type specific recommendations
-injury_type_recommendation('Knee', [
-    'Focus on strengthening quadriceps and hamstrings',
-    'Include low-impact exercises like swimming or cycling',
-    'Avoid high-impact activities like running or jumping',
-    'Use proper form during squats and lunges',
-    'Consider using knee braces during training'
-]).
+injury_type_recommendation(Type, Recommendations) :-
+    ( body_part_recommendation(Type, Recommendations)
+    ; general_injury_recommendation(Type, Recommendations)
+    ).
 
-injury_type_recommendation('Shoulder', [
+% Body part specific recommendations
+body_part_recommendation(shoulder, [
     'Strengthen rotator cuff muscles',
     'Include shoulder mobility exercises',
     'Avoid overhead movements initially',
@@ -728,7 +771,15 @@ injury_type_recommendation('Shoulder', [
     'Gradually increase range of motion'
 ]).
 
-injury_type_recommendation('Back', [
+body_part_recommendation(knee, [
+    'Focus on strengthening quadriceps and hamstrings',
+    'Include low-impact exercises like swimming or cycling',
+    'Avoid high-impact activities like running or jumping',
+    'Use proper form during squats and lunges',
+    'Consider using knee braces during training'
+]).
+
+body_part_recommendation(back, [
     'Strengthen core muscles',
     'Maintain proper posture during exercises',
     'Include flexibility exercises for spine',
@@ -736,7 +787,7 @@ injury_type_recommendation('Back', [
     'Focus on proper form in all movements'
 ]).
 
-injury_type_recommendation('Ankle', [
+body_part_recommendation(ankle, [
     'Strengthen calf muscles',
     'Include balance exercises',
     'Use proper footwear with good support',
@@ -744,13 +795,24 @@ injury_type_recommendation('Ankle', [
     'Consider ankle braces during training'
 ]).
 
-injury_type_recommendation('Elbow', [
+body_part_recommendation(elbow, [
     'Strengthen forearm muscles',
     'Include wrist flexibility exercises',
     'Avoid repetitive movements',
     'Use proper grip techniques',
     'Gradually increase resistance'
 ]).
+
+% General injury type recommendations
+general_injury_recommendation(muscle_strain, [
+    'Apply RICE protocol initially',
+    'Gradually introduce gentle stretching',
+    'Focus on proper warm-up and cool-down',
+    'Strengthen surrounding muscles',
+    'Monitor pain levels during activity'
+]).
+
+% ... (other injury types)
 
 % Severity level recommendations
 severity_recommendation('mild', [
@@ -779,8 +841,11 @@ severity_recommendation('severe', [
 
 % Injury-specific recommendations
 injury_recommendation(sprained_ankle, [
-    "Focus on ankle strengthening exercises like calf raises and resistance band exercises",
-    "Use proper ankle support during training and consider taping for high-impact activities"
+    'Apply RICE protocol (Rest, Ice, Compression, Elevation) in acute phase',
+    'Focus on ankle strengthening exercises like calf raises and resistance band exercises',
+    'Use proper ankle support during training and consider taping for high-impact activities',
+    'Gradually reintroduce balance and proprioception exercises',
+    'Monitor swelling and pain levels during rehabilitation'
 ]).
 
 injury_recommendation(shoulder_impingement, [
@@ -803,20 +868,53 @@ injury_recommendation(back_strain, [
     "Maintain proper posture during exercises and daily activities"
 ]).
 
-% Get specific injury recommendations
+% Specific named injury recommendations
+specific_injury_recommendation('sprained_ankle', [
+    'Focus on ankle strengthening exercises like calf raises and resistance band exercises',
+    'Use proper ankle support during training and consider taping for high-impact activities'
+]).
+
+specific_injury_recommendation('shoulder_impingement', [
+    'Incorporate rotator cuff strengthening exercises with light resistance',
+    'Avoid overhead movements until pain subsides and focus on proper shoulder mechanics'
+]).
+
+specific_injury_recommendation('hamstring_strain', [
+    'Gradually increase hamstring flexibility through controlled stretching',
+    'Strengthen hamstrings with eccentric exercises like Nordic curls'
+]).
+
+specific_injury_recommendation('knee_tendonitis', [
+    'Reduce high-impact activities and focus on quadriceps strengthening',
+    'Use proper warm-up and cool-down routines, including foam rolling'
+]).
+
+specific_injury_recommendation('back_strain', [
+    'Focus on core strengthening exercises to support the lower back',
+    'Maintain proper posture during exercises and daily activities'
+]).
+
+% Get combined injury recommendations
 get_injury_recommendations(UserId, Recommendations) :-
     findall(
         Recs,
-        (user_injury(UserId, Type, _, _, _, _),
-         injury_recommendation(Type, Recs)),
+        ( user_injury(UserId, Type, _, Severity, _, _),
+          % Try specific injury recommendations first
+          ( injury_recommendation(Type, SpecificRecs) -> Recs = SpecificRecs
+          ; % If no specific recommendation, try body part or general recommendations
+            ( injury_type_recommendation(Type, TypeRecs),
+              severity_recommendation(Severity, SeverityRecs),
+              append(TypeRecs, SeverityRecs, Recs)
+            )
+          )
+        ),
         InjuryRecs
     ),
-    (InjuryRecs = [] ->
+    ( InjuryRecs = [] ->
         Recommendations = ["No current injuries. Continue with regular training and recovery protocols."]
     ;
         flatten(InjuryRecs, AllRecs),
-        % Take only the first 2-3 recommendations
-        (length(AllRecs, L), L > 3 ->
+        ( length(AllRecs, L), L > 3 ->
             take(3, AllRecs, Recommendations)
         ;
             Recommendations = AllRecs
@@ -829,3 +927,31 @@ take(N, [H|T], [H|R]) :-
     N > 0,
     N1 is N - 1,
     take(N1, T, R).
+
+% Training plans for cycling
+training_plan(beginner, cycling, Plan) :-
+    Plan = [
+        'Start with 30-45 minute rides, 2-3 times per week',
+        'Focus on proper bike fit and basic cycling technique',
+        'Practice gear shifting and maintaining steady cadence',
+        'Include flat terrain rides initially',
+        'Gradually increase duration by 10-15 minutes each week'
+    ].
+
+training_plan(intermediate, cycling, Plan) :-
+    Plan = [
+        'Ride 3-4 times per week, mixing different types of rides',
+        'Include one long ride (2+ hours) per week',
+        'Add interval training: 5x3 minutes at high intensity with 2 minutes recovery',
+        'Incorporate hill training once per week',
+        'Include strength training 2 times per week focusing on core and legs'
+    ].
+
+training_plan(advanced, cycling, Plan) :-
+    Plan = [
+        'Ride 4-6 times per week with structured workouts',
+        'Long rides of 3+ hours at endurance pace',
+        'High-intensity intervals: 6-8x5 minutes at threshold with 3 minutes recovery',
+        'Technical skill work: climbing, descending, and cornering',
+        'Strength training 2-3 times per week with focus on power development'
+    ].
