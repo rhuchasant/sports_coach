@@ -832,3 +832,33 @@ take(N, [H|T], [H|R]) :-
     N > 0,
     N1 is N - 1,
     take(N1, T, R).
+
+% filepath: c:\Users\Rhucha Sant\ai_proj\backend\sports_fitness_coach.pl
+
+% Existing chatbot responses
+chatbot_response('what are the benefits of running', 'Running improves cardiovascular health, strengthens muscles, and helps with weight management.').
+chatbot_response('what is the best diet for muscle gain', 'A high-protein diet with balanced carbohydrates and healthy fats is ideal for muscle gain.').
+chatbot_response('how can I recover from a sprained ankle', 'Apply the RICE protocol (Rest, Ice, Compression, Elevation) and gradually reintroduce mobility exercises.').
+
+
+% New chatbot responses
+chatbot_response('what does this app do', 'This app provides personalized training and nutrition plans, injury recovery advice, and expert guidance for sports and fitness.').
+chatbot_response('how can this app help me', 'This app helps you achieve your fitness goals by offering tailored plans based on your fitness level, sport, and preferences.').
+chatbot_response('what sports does this app support', 'This app supports a variety of sports, including running, swimming, cycling, weightlifting, yoga, basketball, soccer, tennis, and more.').
+chatbot_response('can this app help with injury recovery', 'Yes, this app provides injury recovery recommendations based on the type and severity of your injury.').
+chatbot_response('what is the best way to build endurance', 'To build endurance, focus on long-duration, low-intensity exercises like running, cycling, or swimming, and gradually increase the duration over time.').
+chatbot_response('how often should I do strength training', 'For most people, strength training 2-3 times per week is sufficient to build and maintain muscle.').
+chatbot_response('what should I eat before a workout', 'Eat a meal rich in carbohydrates and moderate in protein 2-3 hours before a workout. For quick energy, have a small snack like a banana 30 minutes before.').
+chatbot_response('how do I prevent knee injuries while running', 'To prevent knee injuries, focus on proper running form, wear supportive shoes, strengthen your leg muscles, and avoid overtraining.').
+chatbot_response('what stretches should I do after a workout', 'After a workout, perform static stretches like hamstring stretches, quad stretches, and calf stretches to improve flexibility and reduce soreness.').
+chatbot_response('how much water should I drink daily', 'It is recommended to drink at least 2-3 liters of water daily, and more if you are active or in a hot climate.').
+chatbot_response('what is the best way to lose weight', 'The best way to lose weight is to combine a calorie-controlled diet with regular exercise, focusing on both cardio and strength training.').
+chatbot_response('how can I improve my flexibility', 'To improve flexibility, practice regular stretching exercises, yoga, or Pilates, and hold each stretch for at least 20-30 seconds.').
+chatbot_response('what are the benefits of yoga', 'Yoga improves flexibility, strength, and balance, reduces stress, and enhances mental clarity and relaxation.').
+chatbot_response('how can I stay motivated to exercise', 'Set clear goals, track your progress, find a workout buddy, and choose activities you enjoy to stay motivated.').
+chatbot_response('what is the best way to recover after a workout', 'To recover after a workout, hydrate, eat a balanced meal with protein and carbs, stretch, and get enough sleep.').
+chatbot_response('how do I know if I am overtraining', 'Signs of overtraining include persistent fatigue, decreased performance, irritability, and difficulty sleeping. Take rest days and listen to your body.').
+chatbot_response('what is the best time of day to exercise', 'The best time to exercise depends on your schedule and preferences. Morning workouts can boost energy, while evening workouts may improve performance.').
+chatbot_response('how can I track my fitness progress', 'Track your fitness progress by keeping a journal, using fitness apps, or monitoring metrics like weight, strength, endurance, and flexibility.').
+chatbot_response('what are the benefits of strength training', 'Strength training builds muscle, increases metabolism, improves bone density, and enhances overall physical performance.').
+chatbot_response(_, 'I am not sure about that. Please consult a professional.').
