@@ -486,5 +486,23 @@ def get_injury_recommendations(user_id):
         app.logger.error(f"Error getting injury recommendations: {str(e)}")
         return jsonify({'error': 'Failed to get injury recommendations'}), 500
 
+@app.route('/api/chatbot', methods=['POST'])
+def chatbot_query():
+    try:
+        data = request.json
+        question = data.get('question', '')
+
+        # Query Prolog for an answer
+        results = list(prolog.query(f"chatbot_response('{question}', Response)"))
+        if results:
+            response = results[0]['Response']
+        else:
+            response = "I'm sorry, I don't have an answer for that."
+
+        return jsonify({"response": response})
+    except Exception as e:
+        app.logger.error(f"Error in chatbot_query: {str(e)}")
+        return jsonify({"response": "An error occurred while processing your question."}), 500
+
 if __name__ == '__main__':
     app.run(debug=True)

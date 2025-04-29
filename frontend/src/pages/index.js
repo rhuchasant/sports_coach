@@ -6,6 +6,7 @@ import UserProfileSetup from '../components/UserProfileSetup';
 import InjuryHistory from '../components/InjuryHistory';
 import PreviousAchievements from '../components/PreviousAchievements';
 import { motion } from 'framer-motion';
+import Chatbot from '../components/Chatbot';
 
 export default function Home() {
   const router = useRouter();
@@ -105,6 +106,8 @@ export default function Home() {
             Get Started
           </motion.button>
         </motion.div>
+
+        <Chatbot />
 
         <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-4xl mx-auto mt-16">
           <motion.div
